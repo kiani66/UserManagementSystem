@@ -35,6 +35,10 @@ namespace UserManagementSystem.Api.Controllers
             await _userService.CreateUserAsync(user);
             return Ok(new { Message = "User created successfully" });
         }
+
+        private void test()
+        {
+        }
     }
 
 }
