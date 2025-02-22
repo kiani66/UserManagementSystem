@@ -4,8 +4,12 @@ namespace UserManagementSystem.Infrastructure.Interfaces
 {
     public interface IUserRepository
     {
-        Task<List<User>> GetUsersAsync();
-        Task AddUserAsync(User user);
-        Task<User?> GetUserByEmailAsync(string email);
+        Task<List<User>> GetAllAsync();
+        Task AddAsync(User user);
+        Task<User?> GetByEmailAsync(string email);
+        Task<User?> GetByIdAsync(int id);
+        Task UpdateAsync(User user);
+        Task<bool> DeleteByIdAsync(int id);
+        Task<bool> ExistsByEmailAsync(string email);
     }
 }

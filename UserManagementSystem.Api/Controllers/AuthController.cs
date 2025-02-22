@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using UserManagementSystem.Api.Models;
+using UserManagementSystem.Application.DTOs.Responses;
 using UserManagementSystem.Application.Interfcaces;
 using UserManagementSystem.Domain.Entities;
 
@@ -26,29 +27,26 @@ namespace UserManagementSystem.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
-            if (loginRequest == null || string.IsNullOrWhiteSpace(loginRequest.Email) || string.IsNullOrWhiteSpace(loginRequest.Password))
-            {
-                return BadRequest("Invalid login request.");
-            }
+            if (string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
+                return BadRequest(new ApiResponse<string> { Success = false, Message = "Email and Password are required." });
 
-            // دریافت کاربر از دیتابیس
-            var user = await _userService.GetUserByEmailAsync(loginRequest.Email);
+            var user = await _userService.GetWithPasswordByEmailAsync(loginRequest.Email);
             if (user == null)
-            {
-                return Unauthorized("User not found.");
-            }
+                return Unauthorized(new ApiResponse<string> { Success = false, Message = "Invalid email or password." });
 
-            // بررسی رمز عبور
             if (!VerifyPassword(loginRequest.Password, user.PasswordHash))
+                return Unauthorized(new ApiResponse<string> { Success = false, Message = "Invalid email or password." });
+
+            var token = GenerateJwtToken(user.Id , user.Email , user.Role);
+
+            return Ok(new ApiResponse<object>
             {
-                return Unauthorized("Invalid password.");
-            }
-
-            // ایجاد `JWT Token`
-            var token = GenerateJwtToken(user);
-
-            return Ok(new { token });
+                Success = true,
+                Message = "Login successful.",
+                Data = new { Token = token, User = new { user.Id, user.Name, user.Email, user.Role } }
+            });
         }
+
 
         private bool VerifyPassword(string password, string storedHash)
         {
@@ -58,16 +56,16 @@ namespace UserManagementSystem.Api.Controllers
             return hashedPassword == storedHash;
         }
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(int userId, string email, string role)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, role ?? "User")
             };
 
             var token = new JwtSecurityToken(

@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using UserManagementSystem.Application.CQRS.Handlers.Roles;
+using UserManagementSystem.Application.Interfaces;
 using UserManagementSystem.Application.Interfcaces;
 using UserManagementSystem.Application.Services;
 using UserManagementSystem.Infrastructure.Data;
@@ -20,27 +21,28 @@ namespace UserManagementSystem.Api
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateRoleCommandHandler).Assembly));
-
-            // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            //ثبت سرویس ها
             builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-
+            builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+            
             // تنظیم دیتابیس
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // ثبت Repositoryها
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+            builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
             // اضافه کردن Swagger به DI
             builder.Services.AddEndpointsApiExplorer();
 
+            //AutoMapper
+            builder.Services.AddAutoMapper(typeof(Program));
 
             #region SwaggerToken
 
@@ -77,12 +79,6 @@ namespace UserManagementSystem.Api
 
 
             #endregion  SwaggerToken
-
-
-
-
-
-
             #region Authorization_Jwt
             // کلید امنیتی برای امضای توکن‌ها
             var key = Encoding.UTF8.GetBytes("ThisIsASecretKeyForJWTWithAtLeast32Char");
@@ -108,8 +104,6 @@ namespace UserManagementSystem.Api
             builder.Services.AddAuthorization();
             #endregion
 
-          
-
             var app = builder.Build();
 
             app.UseAuthentication(); // فعال‌سازی احراز هویت
@@ -134,8 +128,11 @@ namespace UserManagementSystem.Api
                 // حذف دیتابیس
                 context.Database.EnsureDeleted();
 
-                // ایجاد مجدد دیتابیس
-                context.Database.Migrate();
+                //// ایجاد مجدد دیتابیس
+                //context.Database.Migrate();
+
+                // ایجاد دیتابیس بدون نیاز به مایگریشن
+                context.Database.EnsureCreated();
 
                 // مقداردهی اولیه دیتابیس
                 SeedData.Initialize(context);

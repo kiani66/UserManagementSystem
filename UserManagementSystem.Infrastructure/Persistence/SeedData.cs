@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using UserManagementSystem.Domain.Entities;
+using UserManagementSystem.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using UserManagementSystem.Infrastructure.Data;
 
 namespace UserManagementSystem.Infrastructure.Persistence
@@ -9,10 +11,10 @@ namespace UserManagementSystem.Infrastructure.Persistence
     {
         public static void Initialize(ApplicationDbContext context)
         {
-            // بررسی و مقداردهی Permissions
+            // مقداردهی `Permissions`
             if (!context.Permissions.Any())
             {
-                var permissions = new List<Permission>
+                var initialPermissions = new List<Permission>
                 {
                     new Permission { Name = "ViewUsers" },
                     new Permission { Name = "EditUsers" },
@@ -20,10 +22,11 @@ namespace UserManagementSystem.Infrastructure.Persistence
                     new Permission { Name = "ViewRoles" },
                     new Permission { Name = "ManageRoles" }
                 };
-                context.Permissions.AddRange(permissions);
+                context.Permissions.AddRange(initialPermissions);
                 context.SaveChanges();
             }
 
+            // مقداردهی `Roles`
             if (!context.Roles.Any())
             {
                 var roles = new List<Role>
@@ -36,53 +39,54 @@ namespace UserManagementSystem.Infrastructure.Persistence
                 context.Roles.AddRange(roles);
                 context.SaveChanges();
             }
+
+            // دریافت `RoleId` ها از دیتابیس
             var adminRole = context.Roles.FirstOrDefault(r => r.Name == "Admin");
             var userRole = context.Roles.FirstOrDefault(r => r.Name == "User");
             var managerRole = context.Roles.FirstOrDefault(r => r.Name == "Manager");
 
-            var viewUsers = context.Permissions.FirstOrDefault(p => p.Name == "ViewUsers");
-            var editUsers = context.Permissions.FirstOrDefault(p => p.Name == "EditUsers");
-            var deleteUsers = context.Permissions.FirstOrDefault(p => p.Name == "DeleteUsers");
-            var viewRoles = context.Permissions.FirstOrDefault(p => p.Name == "ViewRoles");
-            var manageRoles = context.Permissions.FirstOrDefault(p => p.Name == "ManageRoles");
+            // دریافت `PermissionId` ها از دیتابیس
+            var permissions = context.Permissions.ToDictionary(p => p.Name, p => p.Id);
 
-            if (!context.RolePermissions.Any() && adminRole != null && viewUsers != null)
+            if (!context.RolePermissions.Any() && adminRole != null && permissions.Count > 0)
             {
                 var rolePermissions = new List<RolePermission>
                 {
-                    new RolePermission { RoleId = adminRole.Id, PermissionId = viewUsers.Id },
-                    new RolePermission { RoleId = adminRole.Id, PermissionId = editUsers.Id },
-                    new RolePermission { RoleId = adminRole.Id, PermissionId = deleteUsers.Id },
-                    new RolePermission { RoleId = adminRole.Id, PermissionId = viewRoles.Id },
-                    new RolePermission { RoleId = adminRole.Id, PermissionId = manageRoles.Id },
+                    new RolePermission { RoleId = adminRole.Id, PermissionId = permissions["ViewUsers"] },
+                    new RolePermission { RoleId = adminRole.Id, PermissionId = permissions["EditUsers"] },
+                    new RolePermission { RoleId = adminRole.Id, PermissionId = permissions["DeleteUsers"] },
+                    new RolePermission { RoleId = adminRole.Id, PermissionId = permissions["ViewRoles"] },
+                    new RolePermission { RoleId = adminRole.Id, PermissionId = permissions["ManageRoles"] },
 
-                    new RolePermission { RoleId = userRole.Id, PermissionId = viewUsers.Id },
+                    new RolePermission { RoleId = userRole.Id, PermissionId = permissions["ViewUsers"] },
 
-                    new RolePermission { RoleId = managerRole.Id, PermissionId = viewUsers.Id },
-                    new RolePermission { RoleId = managerRole.Id, PermissionId = editUsers.Id }
+                    new RolePermission { RoleId = managerRole.Id, PermissionId = permissions["ViewUsers"] },
+                    new RolePermission { RoleId = managerRole.Id, PermissionId = permissions["EditUsers"] }
                 };
 
                 context.RolePermissions.AddRange(rolePermissions);
                 context.SaveChanges();
             }
 
+            // مقداردهی `Users`
             if (!context.Users.Any())
             {
                 var users = new List<User>
                 {
-                    new User { Name="admin", Email = "admin@example.com", PasswordHash = HashPassword("Admin123!"), Role = "Admin" },
-                    new User { Name="user", Email = "user@example.com", PasswordHash = HashPassword("User123!"), Role = "User" },
-                    new User { Name="manager", Email = "manager@example.com", PasswordHash = HashPassword("Manager123!"), Role = "Manager" }
+                    new User { Name = "admin", Email = "admin@example.com", PasswordHash = HashPassword("Admin123!"), RoleId = adminRole.Id, CreatedAt = DateTime.UtcNow },
+                    new User { Name = "user", Email = "user@example.com", PasswordHash = HashPassword("User123!"), RoleId = userRole.Id, CreatedAt = DateTime.UtcNow },
+                    new User { Name = "manager", Email = "manager@example.com", PasswordHash = HashPassword("Manager123!"), RoleId = managerRole.Id, CreatedAt = DateTime.UtcNow }
                 };
 
                 context.Users.AddRange(users);
                 context.SaveChanges();
             }
 
-            // دریافت `Id` ها بعد از مقداردهی
+            // دریافت `UserId` ها از دیتابیس
             var adminUser = context.Users.FirstOrDefault(u => u.Email == "admin@example.com");
             var normalUser = context.Users.FirstOrDefault(u => u.Email == "user@example.com");
             var managerUser = context.Users.FirstOrDefault(u => u.Email == "manager@example.com");
+
             // مقداردهی `UserRoles`
             if (!context.UserRoles.Any() && adminUser != null && adminRole != null)
             {

@@ -12,6 +12,8 @@ namespace UserManagementSystem.Infrastructure.Data
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
 
+        public DbSet<UserProfile> UserProfiles { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -38,12 +40,14 @@ namespace UserManagementSystem.Infrastructure.Data
             modelBuilder.Entity<UserRole>()
                 .HasOne(ur => ur.User)
                 .WithMany()
-                .HasForeignKey(ur => ur.UserId);
+                .HasForeignKey(ur => ur.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<UserRole>()
-                .HasOne(ur => ur.Role)
-                .WithMany()
-                .HasForeignKey(ur => ur.RoleId);
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.UserProfile)
+                .WithOne(up => up.User)
+                .HasForeignKey<UserProfile>(up => up.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }

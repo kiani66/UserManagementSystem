@@ -18,8 +18,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\UserManagementSystem.Application\UserManagementSystem.Application.csproj" />
-		<ProjectReference Include="..\UserManagementSystem.Infrastructure\UserManagementSystem.Infrastructure.csproj" />
-		<ProjectReference Include="..\UserManagementSystem.Domain\UserManagementSystem.Domain.csproj" />
 	</ItemGroup>
 
 
