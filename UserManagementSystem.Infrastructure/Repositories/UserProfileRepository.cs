@@ -14,24 +14,24 @@ namespace UserManagementSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<UserProfile> GetByUserIdAsync(int userId)
+        public async Task<UserProfile> GetProfileByUserIdAsync(int userId)
         {
             return await _context.UserProfiles.FirstOrDefaultAsync(up => up.UserId == userId);
         }
 
-        public async Task CreateAsync(UserProfile userProfile)
+        public async Task CreateProfileAsync(UserProfile userProfile)
         {
             await _context.UserProfiles.AddAsync(userProfile);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(UserProfile userProfile)
+        public async Task UpdateProfileAsync(UserProfile userProfile)
         {
             _context.UserProfiles.Update(userProfile);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(UserProfile userProfile)
+        public async Task DeleteProfileAsync(UserProfile userProfile)
         {
             _context.UserProfiles.Remove(userProfile);
             await _context.SaveChangesAsync();

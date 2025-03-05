@@ -18,28 +18,28 @@ namespace UserManagementSystem.Application.Services
 
         public async Task<UserProfileResponse> GetProfileByUserIdAsync(int userId)
         {
-            var profile = await _userProfileRepository.GetByUserIdAsync(userId);
+            var profile = await _userProfileRepository.GetProfileByUserIdAsync(userId);
             return _mapper.Map<UserProfileResponse>(profile);
         }
 
         public async Task CreateProfileAsync(CreateUserProfileRequest request)
         {
             var userProfile = _mapper.Map<UserProfile>(request);
-            await _userProfileRepository.CreateAsync(userProfile);
+            await _userProfileRepository.CreateProfileAsync(userProfile);
         }
 
         public async Task UpdateProfileAsync(UpdateUserProfileRequest request)
         {
             var userProfile = _mapper.Map<UserProfile>(request);
-            await _userProfileRepository.UpdateAsync(userProfile);
+            await _userProfileRepository.UpdateProfileAsync(userProfile);
         }
 
         public async Task DeleteProfileAsync(int userId)
         {
-            var profile = await _userProfileRepository.GetByUserIdAsync(userId);
+            var profile = await _userProfileRepository.GetProfileByUserIdAsync(userId);
             if (profile != null)
             {
-                await _userProfileRepository.DeleteAsync(profile);
+                await _userProfileRepository.DeleteProfileAsync(profile);
             }
         }
     }

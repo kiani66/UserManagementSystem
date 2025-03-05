@@ -4,9 +4,9 @@ namespace UserManagementSystem.Infrastructure.Interfaces
 {
     public interface IUserProfileRepository
     {
-        Task<UserProfile> GetByUserIdAsync(int userId);
-        Task CreateAsync(UserProfile userProfile);
-        Task UpdateAsync(UserProfile userProfile);
-        Task DeleteAsync(UserProfile userProfile);
+        Task<UserProfile> GetProfileByUserIdAsync(int userId);
+        Task CreateProfileAsync(UserProfile userProfile);
+        Task UpdateProfileAsync(UserProfile userProfile);
+        Task DeleteProfileAsync(UserProfile userProfile);
     }
 }
