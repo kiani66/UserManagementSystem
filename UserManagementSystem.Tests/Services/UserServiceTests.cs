@@ -4,7 +4,7 @@ using UserManagementSystem.Domain.Entities;
 using UserManagementSystem.Application.DTOs.Requests;
 using UserManagementSystem.Application.Services;
 using UserManagementSystem.Infrastructure.Interfaces;
-using UserManagementSystem.Application.Interfcaces;
+using UserManagementSystem.Application.Interfaces;
 
 public class UserServiceTests
 {

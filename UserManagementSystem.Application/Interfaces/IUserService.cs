@@ -3,7 +3,7 @@
 using UserManagementSystem.Application.DTOs.Requests;
 using UserManagementSystem.Application.DTOs.Responses;
 
-namespace UserManagementSystem.Application.Interfcaces
+namespace UserManagementSystem.Application.Interfaces
 {
     public interface IUserService
     {
