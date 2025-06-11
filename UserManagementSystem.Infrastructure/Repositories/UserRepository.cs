@@ -14,7 +14,10 @@ namespace UserManagementSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<List<User>> GetAllAsync() => await _context.Users.ToListAsync();
+        public async Task<List<User>> GetAllAsync() =>
+            await _context.Users
+                .Include(u => u.Role)
+                .ToListAsync();
 
         public async Task AddAsync(User user)
         {
@@ -24,12 +27,17 @@ namespace UserManagementSystem.Infrastructure.Repositories
 
         public Task<User?> GetByEmailAsync(string email)
         {
-            return _context.Users.AsNoTracking().FirstOrDefaultAsync(c=>c.Email == email);
+            return _context.Users.AsNoTracking()
+                
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(c=>c.Email == email);
         }
 
         public async Task<User?> GetByIdAsync(int id)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task UpdateAsync(User user)
