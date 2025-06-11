@@ -5,7 +5,6 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using UserManagementSystem.Application.CQRS.Handlers.Roles;
 using UserManagementSystem.Application.Interfaces;
-using UserManagementSystem.Application.Interfcaces;
 using UserManagementSystem.Application.Services;
 using UserManagementSystem.Infrastructure.Data;
 using UserManagementSystem.Infrastructure.Interfaces;

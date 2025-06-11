@@ -2,7 +2,7 @@
 using System.Text;
 using UserManagementSystem.Api.Models;
 using UserManagementSystem.Application.DTOs.Responses;
-using UserManagementSystem.Application.Interfcaces;
+using UserManagementSystem.Application.Interfaces;
 
 namespace UserManagementSystem.Api.Controllers
 {

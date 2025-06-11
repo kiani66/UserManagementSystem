@@ -338,7 +338,7 @@ D:.
 |   |           UserResponse.cs
 |   |           UserWithPassword.cs
 |   |           
-|   +---Interfcaces
+|   +---Interfaces
 |   |       IUserService.cs
 |   |       
 |   +---obj

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using UserManagementSystem.Application.DTOs.Requests;
 using UserManagementSystem.Application.DTOs.Responses;
-using UserManagementSystem.Application.Interfcaces;
+using UserManagementSystem.Application.Interfaces;
 using UserManagementSystem.Domain.Entities;
 using UserManagementSystem.Infrastructure.Interfaces;
 

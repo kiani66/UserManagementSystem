@@ -10,9 +10,9 @@ namespace UserManagementSystem.Api.Controllers
     [Authorize]
     public class UserController : ControllerBase
     {
-        private readonly Application.Interfcaces.IUserService _userService;
+        private readonly Application.Interfaces.IUserService _userService;
 
-        public UserController(Application.Interfcaces.IUserService userService)
+        public UserController(Application.Interfaces.IUserService userService)
         {
             _userService = userService;
         }
